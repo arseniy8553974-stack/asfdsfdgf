@@ -1,0 +1,510 @@
+-- // 💀 DOORS GOD MODE | ЭКСКЛЮЗИВНЫЙ СКРИПТ С GUI (ПОЛНОЕ ИЗДАНИЕ) 💀 //
+
+-- 1. ИНИЦИАЛИЗАЦИЯ
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local Workspace = game:GetService("Workspace")
+local Lighting = game:GetService("Lighting")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+-- 2. НАСТРОЙКИ
+local Settings = {
+    -- ESP
+    ESP_Monsters = true,
+    ESP_Items = true,
+    ESP_Doors = true,
+    ESP_Closets = true,      -- Шкафы/укрытия
+    ESP_Books = true,        -- Книги в библиотеке
+    ESP_Players = true,
+    -- Player
+    GodMode = true,
+    Noclip = true,
+    Fly = true,
+    SpeedHack = 24,
+    JumpPower = 50,
+    Fullbright = true,
+    -- World
+    AutoUnlock = true,
+    AutoCollect = true,
+    MonsterWarnings = true   -- Уведомления о монстрах
+}
+
+-- Расширенный список монстров DOORS
+local MonsterConfig = {
+    Rush = {color = Color3.fromRGB(255, 100, 0), dist = 150, warning = "⚠️ RUSH БЛИЗКО! ПРЯЧЬСЯ! ⚠️"},
+    Ambush = {color = Color3.fromRGB(0, 255, 100), dist = 150, warning = "⚠️ AMBUSH! ОН ВОЗВРАЩАЕТСЯ! ⚠️"},
+    Seek = {color = Color3.fromRGB(255, 0, 0), dist = 200, warning = "👁️ SEEK СМОТРИТ! БЕГИ! 👁️"},
+    Figure = {color = Color3.fromRGB(150, 0, 255), dist = 120, warning = "🦯 FIGURE РЯДОМ! ТИХО! 🦯"},
+    Screech = {color = Color3.fromRGB(255, 255, 0), dist = 60, warning = "🦇 SCREECH! СМОТРИ В ГЛАЗА! 🦇"},
+    Halt = {color = Color3.fromRGB(0, 255, 255), dist = 100, warning = "🚦 HALT! СТОЙ И ИДИ! 🚦"},
+    Eyes = {color = Color3.fromRGB(255, 0, 255), dist = 80, warning = "👀 ГЛАЗА! НЕ СМОТРИ! 👀"},
+    Hide = {color = Color3.fromRGB(139, 69, 19), dist = 50, warning = "😡 HIDE! ВЫЛЕЗАЙ ИЗ ШКАФА! 😡"},
+    Timothy = {color = Color3.fromRGB(255, 192, 203), dist = 20, warning = "🕷️ TIMOTHY В СУНДУКЕ! 🕷️"},
+    Jack = {color = Color3.fromRGB(255, 255, 255), dist = 30, warning = "🎭 JACK! НЕ ВХОДИ В ШКАФ! 🎭"},
+    Shadow = {color = Color3.fromRGB(128, 128, 128), dist = 40, warning = "👻 ТЕНЬ! ОНА ПРОСТО СМОТРИТ! 👻"},
+    Glitch = {color = Color3.fromRGB(0, 255, 0), dist = 100, warning = "💻 ГЛИТЧ! НЕ ЗАСТРЕВАЙ! 💻"},
+    Dupe = {color = Color3.fromRGB(255, 165, 0), dist = 50, warning = "🚪 DUPE! ПРОВЕРЬ ДВЕРИ! 🚪"},
+    Snare = {color = Color3.fromRGB(0, 100, 0), dist = 10, warning = "🌿 ЛОВУШКА! НЕ НАСТУПИ! 🌿"}
+}
+
+-- 3. СОЗДАНИЕ АДАПТИВНОГО GUI (для ПК и мобильных)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DoorsGodGUI"
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 500)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- Плавное масштабирование для мобильных устройств
+if UserInputService.TouchEnabled then
+    MainFrame.Size = UDim2.new(0, 350, 0, 550)
+    MainFrame.Position = UDim2.new(0.5, -175, 0.5, -275)
+end
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 16)
+UICorner.Parent = MainFrame
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(0, 255, 255)
+UIStroke.Thickness = 3
+UIStroke.Transparency = 0.4
+UIStroke.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 50)
+Title.BackgroundTransparency = 1
+Title.Text = "🚪 DOORS GOD MODE 🚪"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = UserInputService.TouchEnabled and 24 or 20
+Title.Font = Enum.Font.GothamBlack
+Title.Parent = MainFrame
+
+local TitleGradient = Instance.new("UIGradient")
+TitleGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 255, 200)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(150, 0, 255))
+})
+TitleGradient.Rotation = 45
+TitleGradient.Parent = Title
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, UserInputService.TouchEnabled and 40 or 36, 0, UserInputService.TouchEnabled and 40 or 36)
+CloseButton.Position = UDim2.new(1, UserInputService.TouchEnabled and -48 or -44, 0, 7)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+CloseButton.BackgroundTransparency = 0.3
+CloseButton.Text = "✕"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = UserInputService.TouchEnabled and 30 or 26
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 12)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(1, -20, 1, -60)
+ScrollingFrame.Position = UDim2.new(0, 10, 0, 55)
+ScrollingFrame.BackgroundTransparency = 1
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.ScrollBarThickness = UserInputService.TouchEnabled and 8 or 5
+ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 200)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+ScrollingFrame.Parent = MainFrame
+
+-- Удобная функция создания тогглов с увеличенными хитбоксами для мобильных
+local function createToggle(name, settingName, yPos, icon)
+    local Button = Instance.new("TextButton")
+    local buttonHeight = UserInputService.TouchEnabled and 55 or 45
+    Button.Size = UDim2.new(1, -10, 0, buttonHeight)
+    Button.Position = UDim2.new(0, 5, 0, yPos)
+    Button.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    Button.BackgroundTransparency = 0.4
+    Button.BorderSizePixel = 0
+    Button.Text = icon .. " " .. name .. ": " .. (Settings[settingName] and "✅ ВКЛ" or "❌ ВЫКЛ")
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = UserInputService.TouchEnabled and 16 or 14
+    Button.Font = Enum.Font.GothamSemibold
+    Button.Parent = ScrollingFrame
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.Parent = Button
+
+    local Stroke = Instance.new("UIStroke")
+    Stroke.Color = Color3.fromRGB(0, 255, 200)
+    Stroke.Thickness = 2
+    Stroke.Transparency = 0.5
+    Stroke.Parent = Button
+
+    Button.MouseButton1Click:Connect(function()
+        Settings[settingName] = not Settings[settingName]
+        Button.Text = icon .. " " .. name .. ": " .. (Settings[settingName] and "✅ ВКЛ" or "❌ ВЫКЛ")
+    end)
+
+    return Button
+end
+
+-- Создаем все тогглы
+createToggle("ESP Монстры", "ESP_Monsters", 15, "👁️")
+createToggle("ESP Предметы", "ESP_Items", 80, "📦")
+createToggle("ESP Двери", "ESP_Doors", 145, "🚪")
+createToggle("ESP Шкафы", "ESP_Closets", 210, "🗄️")
+createToggle("ESP Книги (Библиотека)", "ESP_Books", 275, "📚")
+createToggle("ESP Игроки", "ESP_Players", 340, "👤")
+createToggle("Полёт (клавиша F)", "Fly", 405, "🪽")
+createToggle("Неуязвимость", "GodMode", 470, "🛡️")
+createToggle("Проходить сквозь стены", "Noclip", 535, "🚧")
+createToggle("Ускорение x2", "SpeedHack", 600, "⚡")
+createToggle("Супер-прыжок", "JumpPower", 665, "🦘")
+createToggle("Полное освещение", "Fullbright", 730, "💡")
+createToggle("Авто-открытие дверей", "AutoUnlock", 795, "🔓")
+createToggle("Авто-сбор предметов", "AutoCollect", 860, "💰")
+createToggle("Уведомления о монстрах", "MonsterWarnings", 925, "📢")
+
+-- 4. ФУНКЦИОНАЛЬНАЯ ЧАСТЬ
+
+-- Характеристики персонажа
+LocalPlayer.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid")
+    hum:GetPropertyChangedSignal("Health"):Connect(function()
+        if Settings.GodMode and hum.Health < hum.MaxHealth then
+            hum.Health = hum.MaxHealth
+        end
+    end)
+    hum.WalkSpeed = Settings.SpeedHack
+    hum.JumpPower = Settings.JumpPower
+end)
+
+if LocalPlayer.Character then
+    local hum = LocalPlayer.Character:FindFirstChild("Humanoid")
+    if hum then
+        hum.WalkSpeed = Settings.SpeedHack
+        hum.JumpPower = Settings.JumpPower
+    end
+end
+
+-- Noclip
+RunService.Stepped:Connect(function()
+    if Settings.Noclip and LocalPlayer.Character then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- Полное освещение
+if Settings.Fullbright then
+    Lighting.Brightness = 3
+    Lighting.Ambient = Color3.fromRGB(200, 200, 200)
+    Lighting.FogEnd = 100000
+    Lighting.FogStart = 0
+end
+
+-- Уведомления о монстрах (красивый GUI)
+local WarningFrame = Instance.new("Frame")
+WarningFrame.Size = UDim2.new(0, 300, 0, 70)
+WarningFrame.Position = UDim2.new(0.5, -150, 0.1, 0)
+WarningFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+WarningFrame.BackgroundTransparency = 0.2
+WarningFrame.Visible = false
+WarningFrame.Parent = ScreenGui
+Instance.new("UICorner", WarningFrame).CornerRadius = UDim.new(0, 12)
+Instance.new("UIStroke", WarningFrame).Color = Color3.fromRGB(255, 0, 0)
+
+local WarningLabel = Instance.new("TextLabel")
+WarningLabel.Size = UDim2.new(1, 0, 0, 30)
+WarningLabel.BackgroundTransparency = 1
+WarningLabel.Text = "⚠️ ОПАСНОСТЬ ⚠️"
+WarningLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+WarningLabel.Font = Enum.Font.GothamBlack
+WarningLabel.TextSize = 22
+WarningLabel.Parent = WarningFrame
+
+local WarningDistance = Instance.new("TextLabel")
+WarningDistance.Size = UDim2.new(1, 0, 0, 20)
+WarningDistance.Position = UDim2.new(0, 0, 0, 35)
+WarningDistance.BackgroundTransparency = 1
+WarningDistance.Text = "Расстояние: 0m"
+WarningDistance.TextColor3 = Color3.fromRGB(200, 200, 200)
+WarningDistance.Font = Enum.Font.Gotham
+WarningDistance.TextSize = 14
+WarningDistance.Parent = WarningFrame
+
+-- Полёт
+local flying = false
+local flySpeed = 50
+local bg, bv
+
+local function startFly()
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChild("Humanoid")
+    if not root or not hum then return end
+    flying = true
+    bg = Instance.new("BodyGyro")
+    bg.P = 9e4
+    bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    bg.CFrame = root.CFrame
+    bg.Parent = root
+    bv = Instance.new("BodyVelocity")
+    bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    bv.Velocity = Vector3.zero
+    bv.Parent = root
+    hum.PlatformStand = true
+end
+
+local function stopFly()
+    flying = false
+    if bg then bg:Destroy() end
+    if bv then bv:Destroy() end
+    local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
+    if hum then hum.PlatformStand = false end
+end
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.F and Settings.Fly then
+        if flying then stopFly() else startFly() end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if flying and Settings.Fly then
+        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if root then
+            local cam = workspace.CurrentCamera
+            local move = Vector3.zero
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then move -= Vector3.new(0, 1, 0) end
+            if bv then bv.Velocity = move * flySpeed end
+            if bg then bg.CFrame = cam.CFrame end
+        end
+    end
+end)
+
+-- Расширенный ESP (с поддержкой всех объектов)
+local function createHighlight(obj, color, name)
+    if obj:FindFirstChild("ESP_Highlight") then return end
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESP_Highlight"
+    highlight.FillColor = color
+    highlight.FillTransparency = 0.5
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.OutlineTransparency = 0
+    highlight.Parent = obj
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "ESP_Label"
+    billboard.Size = UDim2.new(0, 100, 0, 30)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = obj
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = name
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 14
+    label.Font = Enum.Font.GothamBold
+    label.TextStrokeTransparency = 0
+    label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    label.Parent = billboard
+end
+
+local function isMonster(obj)
+    local name = obj.Name:lower()
+    for monster, config in pairs(MonsterConfig) do
+        if name:find(monster:lower()) then
+            return true, monster, config
+        end
+    end
+    return false, nil, nil
+end
+
+local function updateESP()
+    local closestMonster = nil
+    local closestDist = math.huge
+    local closestConfig = nil
+    
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        local highlight = obj:FindFirstChild("ESP_Highlight")
+        local label = obj:FindFirstChild("ESP_Label")
+        local shouldShow = false
+        local color = Color3.fromRGB(255, 255, 255)
+        local displayName = obj.Name
+        
+        -- Монстры
+        local isMonsterObj, monsterType, monsterConfig = isMonster(obj)
+        if isMonsterObj and Settings.ESP_Monsters then
+            shouldShow = true
+            color = monsterConfig.color
+            displayName = monsterType
+            
+            -- Проверка расстояния для уведомлений
+            if Settings.MonsterWarnings and LocalPlayer.Character then
+                local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    local objPos = obj:IsA("Model") and obj:GetPivot().Position or obj.Position
+                    local dist = (objPos - root.Position).Magnitude
+                    if dist <= monsterConfig.dist then
+                        if dist < closestDist then
+                            closestDist = dist
+                            closestMonster = monsterType
+                            closestConfig = monsterConfig
+                        end
+                    end
+                end
+            end
+        end
+        
+        -- Предметы
+        if not shouldShow and Settings.ESP_Items then
+            local nameLower = obj.Name:lower()
+            if obj:IsA("Tool") or nameLower:find("key") or nameLower:find("lockpick") 
+                or nameLower:find("vitamin") or nameLower:find("flashlight") 
+                or nameLower:find("lighter") or nameLower:find("gold") 
+                or nameLower:find("coin") or nameLower:find("battery") then
+                shouldShow = true
+                color = Color3.fromRGB(255, 255, 0)
+                displayName = "📦 " .. obj.Name
+            end
+        end
+        
+        -- Двери
+        if not shouldShow and Settings.ESP_Doors then
+            if obj:IsA("Model") and obj.Name:lower():find("door") then
+                shouldShow = true
+                color = Color3.fromRGB(0, 255, 0)
+                displayName = "🚪 " .. obj.Name
+            end
+        end
+        
+        -- Шкафы/укрытия
+        if not shouldShow and Settings.ESP_Closets then
+            local nameLower = obj.Name:lower()
+            if obj:IsA("Model") and (nameLower:find("wardrobe") or nameLower:find("closet") or nameLower:find("bed")) then
+                shouldShow = true
+                color = Color3.fromRGB(139, 69, 19)
+                displayName = "🗄️ " .. obj.Name
+            end
+        end
+        
+        -- Книги в библиотеке
+        if not shouldShow and Settings.ESP_Books then
+            local nameLower = obj.Name:lower()
+            if obj:IsA("BasePart") and (nameLower:find("book") or nameLower:find("paper")) then
+                shouldShow = true
+                color = Color3.fromRGB(255, 215, 0)
+                displayName = "📚 " .. obj.Name
+            end
+        end
+        
+        -- Игроки
+        if not shouldShow and Settings.ESP_Players then
+            if obj:IsA("Model") then
+                local player = Players:GetPlayerFromCharacter(obj)
+                if player and player ~= LocalPlayer then
+                    shouldShow = true
+                    color = Color3.fromRGB(0, 100, 255)
+                    displayName = "👤 " .. player.Name
+                end
+            end
+        end
+        
+        if shouldShow then
+            if not highlight and not label then
+                createHighlight(obj, color, displayName)
+            end
+            if label and LocalPlayer.Character then
+                local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if root then
+                    local objPos = obj:IsA("Model") and obj:GetPivot().Position or obj.Position
+                    local distance = (objPos - root.Position).Magnitude
+                    label.TextLabel.Text = displayName .. " [" .. math.floor(distance) .. "m]"
+                end
+            end
+        else
+            if highlight then highlight:Destroy() end
+            if label then label:Destroy() end
+        end
+    end
+    
+    -- Показываем уведомление о ближайшем монстре
+    if closestMonster and closestConfig then
+        WarningFrame.Visible = true
+        WarningLabel.Text = closestConfig.warning
+        WarningLabel.TextColor3 = closestConfig.color
+        WarningDistance.Text = "Расстояние: " .. math.floor(closestDist) .. "m"
+    else
+        WarningFrame.Visible = false
+    end
+end
+
+RunService.Heartbeat:Connect(updateESP)
+
+-- Авто-открытие дверей и авто-сбор предметов
+spawn(function()
+    while true do
+        wait(0.3)
+        if LocalPlayer.Character then
+            local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if root then
+                -- Авто-открытие дверей
+                if Settings.AutoUnlock then
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if obj:IsA("Model") and obj.Name:lower():find("door") then
+                            for _, prompt in ipairs(obj:GetDescendants()) do
+                                if prompt:IsA("ProximityPrompt") then
+                                    spawn(function()
+                                        prompt:InputHoldBegin()
+                                        wait(0.3)
+                                        prompt:InputHoldEnd()
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                -- Авто-сбор предметов
+                if Settings.AutoCollect then
+                    for _, obj in ipairs(Workspace:GetDescendants()) do
+                        if obj:IsA("Tool") then
+                            local handle = obj:FindFirstChild("Handle")
+                            if handle then
+                                firetouchinterest(root, handle, 0)
+                                firetouchinterest(root, handle, 1)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+print("✅ DOORS GOD MODE (ПОЛНОЕ ИЗДАНИЕ) активирован!") 
